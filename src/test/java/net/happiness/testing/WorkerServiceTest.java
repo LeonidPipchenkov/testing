@@ -22,7 +22,7 @@ class WorkerServiceTest {
     void sumOfSalaries() {
         Worker worker1 = new Worker(1, "Дмитрий", 100_000);
         Worker worker2 = new Worker(1, "Дмитрий", 150_000);
-        Mockito.when(workerRepository.getWorkers()).thenReturn(List.of(worker1, worker2));
+        Mockito.when(workerRepository.findAll()).thenReturn(List.of(worker1, worker2));
 
         int sumOfSalariesOfAllWorkers = workerService.getSumOfSalariesOfAllWorkers();
 
@@ -32,14 +32,14 @@ class WorkerServiceTest {
     @Test
     void hire_withLowSalary_throwsException() {
         Worker worker = new Worker(1, "Алексей", 15_000);
-        Assertions.assertThrows(TooLowSalaryException.class, () -> workerService.hire(worker));
+        Assertions.assertThrows(TooLowSalaryException.class, () -> workerService.hireWorker(worker));
     }
 
     @Test
     void hire_withValidSalary_savesWorker() {
         Worker worker = new Worker(1, "Иван", 20_000);
-        workerService.hire(worker);
-        Mockito.verify(workerRepository, Mockito.times(1)).saveWorker(worker);
+        workerService.hireWorker(worker);
+        Mockito.verify(workerRepository, Mockito.times(1)).save(worker);
     }
 
 }

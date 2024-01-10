@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -12,17 +13,29 @@ public class WorkerService {
     private final WorkerRepository workerRepository;
 
     public int getSumOfSalariesOfAllWorkers() {
-        List<Worker> workers = workerRepository.getWorkers();
+        List<Worker> workers = workerRepository.findAll();
         return workers.stream()
                 .mapToInt(Worker::getSalary)
                 .sum();
     }
 
-    public void hire(Worker worker) {
+    public void hireWorker(Worker worker) {
         if (worker.getSalary() < 16_500) {
             throw new TooLowSalaryException();
         }
-        workerRepository.saveWorker(worker);
+        workerRepository.save(worker);
+    }
+
+    public Worker findWorkerById(long id) {
+        Optional<Worker> worker = workerRepository.findById(id);
+        return worker.orElseThrow(() -> new WorkerNotFoundException("Worker not found"));
+    }
+
+    public void updateWorker(Worker updatedWorker) {
+        Worker existingWorker = findWorkerById(updatedWorker.getId());
+        existingWorker.setName(updatedWorker.getName());
+        existingWorker.setSalary(updatedWorker.getSalary());
+        workerRepository.update(existingWorker);
     }
 
 }
